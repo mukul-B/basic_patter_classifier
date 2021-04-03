@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/dell/CLionProjects/paternRec/DiscriminantCases.h
+
+C:/Users/dell/CLionProjects/paternRec/MatricOP.h
+bits/stdc++.h
+C:/Users/dell/CLionProjects/paternRec/bits/stdc++.h
+
+C:/Users/dell/CLionProjects/paternRec/RandomNoGenerator.h
+
+C:/Users/dell/CLionProjects/paternRec/fileOP.h
+
+C:/Users/dell/CLionProjects/paternRec/main.cpp
+iostream
+-
+bits/stdc++.h
+C:/Users/dell/CLionProjects/paternRec/bits/stdc++.h
+MatricOP.h
+C:/Users/dell/CLionProjects/paternRec/MatricOP.h
+DiscriminantCases.h
+C:/Users/dell/CLionProjects/paternRec/DiscriminantCases.h
+RandomNoGenerator.h
+C:/Users/dell/CLionProjects/paternRec/RandomNoGenerator.h
+fileOP.h
+C:/Users/dell/CLionProjects/paternRec/fileOP.h
+

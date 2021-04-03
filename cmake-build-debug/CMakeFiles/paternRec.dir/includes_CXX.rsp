@@ -1,0 +1,1 @@
+-I/include -I/Lib/site-packages/numpy/core/include -isystem C:/Python27/include 
