@@ -11,6 +11,7 @@ vector< pair<float, float> > convertStringToFloat(vector< pair<string, string> >
 
 int main() {
     int input;
+    int sampleSize;
 
     vector< pair<string, string> > dataSet1;
     vector< pair<string, string> > dataSet2;
@@ -39,52 +40,34 @@ int main() {
     dataSet1f = convertStringToFloat(dataSet1);
     dataSet2f = convertStringToFloat(dataSet2);
 
+    dataSet1f.insert( dataSet1f.end(), dataSet2f.begin(), dataSet2f.end() );
 
-    float sample_mu_x1 = 0, sample_mu_y1 = 0;
+    cout << "Select a % of samples:" << endl;
+    cout << "1. 0.01%" << endl;
+    cout << "2. 0.1%" << endl;
+    cout << "3. 1%" << endl;
+    cout << "4. 10%" << endl;
+
+    float sample_mu_x = 0, sample_mu_y = 0;
     int counter = 0;
     for (counter; counter < dataSet1f.size(); counter++) {
-        sample_mu_x1 += dataSet1f[counter].first;
-        sample_mu_y1 += dataSet1f[counter].second;
+        sample_mu_x += dataSet1f[counter].first;
+        sample_mu_y += dataSet1f[counter].second;
     }
-    sample_mu_x1 /= counter;
-    sample_mu_y1 /= counter;
+    sample_mu_x /= counter;
+    sample_mu_y /= counter;
 
-    float sample_sigma_x1 = 0, sample_sigma_y1 = 0;
+    float sample_sigma_x = 0, sample_sigma_y = 0;
     counter = 0;
     for (counter; counter < dataSet1f.size(); counter++) {
-        sample_sigma_x1 += pow(dataSet1f[counter].first - sample_mu_x1, 2);
-        sample_sigma_y1 += pow(dataSet1f[counter].second - sample_mu_y1, 2);
+        sample_sigma_x += pow(dataSet1f[counter].first - sample_mu_x, 2);
+        sample_sigma_y += pow(dataSet1f[counter].second - sample_mu_y, 2);
     }
-    sample_sigma_x1 /= counter;
-    sample_sigma_y1 /= counter;
+    sample_sigma_x /= counter;
+    sample_sigma_y /= counter;
 
-
-
-    float sample_mu_x2 = 0, sample_mu_y2 = 0;
-    counter = 0;
-    for (counter; counter < dataSet2f.size(); counter++) {
-        sample_mu_x2 += dataSet2f[counter].first;
-        sample_mu_y2 += dataSet2f[counter].second;
-    }
-    sample_mu_x2 /= counter;
-    sample_mu_y2 /= counter;
-
-    float sample_sigma_x2 = 0, sample_sigma_y2 = 0;
-    counter = 0;
-    for (counter; counter < dataSet2f.size(); counter++) {
-        sample_sigma_x2 += pow(dataSet2f[counter].first - sample_mu_x2, 2);
-        sample_sigma_y2 += pow(dataSet2f[counter].second - sample_mu_y2, 2);
-    }
-    sample_sigma_x2 /= counter;
-    sample_sigma_y2 /= counter;
-
-    cout << "Distribution 1" << endl;
-    cout << "Sample mean: <" << sample_mu_x1 << ", " << sample_mu_y1 << ">" << endl;
-    cout << "Sample covariance: <" << sample_sigma_x1 << ", " << sample_sigma_y1 << ">" << endl;
-    cout << endl;
-    cout << "Distribution 2" << endl;
-    cout << "Sample mean: <" << sample_mu_x2 << ", " << sample_mu_y2 << ">" << endl;
-    cout << "Sample covariance: <" << sample_sigma_x2 << ", " << sample_sigma_y2 << ">" << endl;
+    cout << "Sample mean: <" << sample_mu_x << ", " << sample_mu_y << ">" << endl;
+    cout << "Sample covariance: <" << sample_sigma_x << ", " << sample_sigma_y << ">" << endl;
 
     return 0;
 }
