@@ -39,8 +39,8 @@ sampleMatrix(vector<vector<double>> mu, vector<vector<double> > sigma, pair<int,
         double x = boxMuller();
         double y = boxMuller();
         vector<vector<double> > sampler
-                = {{mu[0][0] + x * sigma[0][0]},
-                   {mu[1][0] + y * sigma[1][1]}};
+                = {{mu[0][0] + x * pow(sigma[0][0],0.5)},
+                   {mu[1][0] + y * pow(sigma[1][1],0.5)}};
         Matrix sample;
         sample.input(sampler, mudimen);
         sam.push_back(sample);
