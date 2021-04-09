@@ -25,8 +25,8 @@ int main() {
     string filename2;
 
     if (input == 1) {
-        filename1 = "./w1.csv";
-        filename2 = "./w2.csv";
+        filename1 = "./psam1.csv";
+        filename2 = "./psam2.csv";
     }
     else if (input == 2) {
         filename1 = "./sam1.csv";

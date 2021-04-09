@@ -86,8 +86,8 @@ int main() {
     string filename2;
 
     if (input == 1) {
-        filename1 = "./w1.csv";
-        filename2 = "./w2.csv";
+        filename1 = "./psam1.csv";
+        filename2 = "./psam2.csv";
     }
     else if (input == 2) {
         filename1 = "./sam1.csv";
@@ -157,7 +157,7 @@ int main() {
         case 1:
             sampleSet = samplespace1(sample_mu_x1, sample_mu_y1, sample_sigma_x1, sample_sigma_y1, 
                                         sample_mu_x2, sample_mu_y2, sample_sigma_x2, sample_sigma_y2);
-            classifierType = classifierCase1;
+            classifierType = classifierCase3;
             break;
         case 2:
             sampleSet = samplespace2(sample_mu_x1, sample_mu_y1, sample_sigma_x1, sample_sigma_y1, 
@@ -227,13 +227,13 @@ void problem(vector<vector<double> > mu1, vector<vector<double> > cov1, int samp
 // all the class are inherited by ClassifierClass
 // so we can use the pointer to the ClassifierClass to achieve virtualization
     ClassifierClass *classifier;
-    if (classificationMethod == classifierCase1) {
+    /* if (classificationMethod == classifierCase1) {
         Case1 classifierType = Case1(m1, m2, cv1, cv2, prior1, prior2);
         classification(sam1, sam2, classifier = &classifierType);
-    } else if (classificationMethod == classifierCase3) {
+    } else if (classificationMethod == classifierCase3) { */
         Case3 classifierType = Case3(m1, m2, cv1, cv2, prior1, prior2);
         classification(sam1, sam2, classifier = &classifierType);
-    }
+    //}
 
 }
 // classification function takes samples and classifier
@@ -271,12 +271,12 @@ void classification(vector<Matrix> samp1, vector<Matrix> samp2,
 
     // Report generation: classification class size ,initial sample size ,
     // miss classification rate and eroor bound
-    cout << "\nSamples classified in  class 1: " << w1.size() << " ,class 2: " << w2.size() << "\n";
-    cout << "Miss-classified from sample 1: " << miss1.size() << " ,sample 2: " << miss2.size() << "\n";
-    cout << "Miss-classification rate  for class 1 : " << (double) miss1.size() / samp1.size() << " ,class 2: "
+    cout << "\nSamples classified in  class 1: " << w1.size() << ", class 2: " << w2.size() << "\n";
+    cout << "Miss-classified from sample 1: " << miss1.size() << ", sample 2: " << miss2.size() << "\n";
+    cout << "Miss-classification rate  for class 1 : " << (double) miss1.size() / samp1.size() << ", class 2: "
          << (double) miss2.size() / samp2.size() << "\n";
-    cout << "Total miss-classification rate  : " << miss_class_rate << '\n';
-    cout << "Bhattacharyya error bound : " << errorbound << endl;
+    cout << "Total miss-classification rate : " << miss_class_rate << '\n';
+    cout << "Bhattacharyya error bound: " << errorbound << endl;
 
     //writeAllResultsToFile(sam1,sam1,w1,w2,miss1,miss2);
     // the values can be stored in excel to get plots
