@@ -107,11 +107,12 @@ int main() {
     dataSet1f = convertStringToFloat(dataSet1);
     dataSet2f = convertStringToFloat(dataSet2);
 
-    cout << "Select pct of samples:" << endl;
+    cout << "====MENU===="
     cout << "1. 0.01%" << endl;
     cout << "2. 0.1%" << endl;
     cout << "3. 1%" << endl;
     cout << "4. 10%" << endl;
+    cout << "Select pct of samples: " << endl;
     cin >> inputp;
 
     int pctSample;

@@ -35,19 +35,20 @@ struct sampleSpace {
     int sampCount2;
 };
 //  sample space 1 have two distribution with same covariance matrix
-sampleSpace samplespace1(float mux1, float muy1, float sigmax1, float sigmay1,
-                            float mux2, float muy2, float sigmax2, float sigmay2) {
+sampleSpace samplespace1(double mux1, double muy1, double sigmax1, double sigmay1,
+                            double mux2, double muy2, double sigmax2, double sigmay2,
+                            double offDiagonal1, double offDiagonal2) {
     sampleSpace s1;
     s1.mu1 = {{mux1},
               {muy1}};
-    s1.cov1 = {{sigmax1, 0},
-               {0, sigmay1}};
+    s1.cov1 = {{sigmax1, offDiagonal1},
+               {offDiagonal1, sigmay1}};
     s1.sampCount1 = 60000;
 
     s1.mu2 = {{mux2},
               {muy2}};
-    s1.cov2 = {{sigmax2, 0},
-               {0, sigmay2}};
+    s1.cov2 = {{sigmax2, offDiagonal2},
+               {offDiagonal2, sigmay2}};
 
     s1.sampCount2 = 140000;
 
@@ -55,29 +56,33 @@ sampleSpace samplespace1(float mux1, float muy1, float sigmax1, float sigmay1,
 }
 
 //  sample space 1 have two distribution with different covariance matrix
-sampleSpace samplespace2(float mux1, float muy1, float sigmax1, float sigmay1,
-                            float mux2, float muy2, float sigmax2, float sigmay2) {
+sampleSpace samplespace2(double mux1, double muy1, double sigmax1, double sigmay1,
+                            double mux2, double muy2, double sigmax2, double sigmay2,
+                            double offDiagonal1, double offDiagonal2) {
     sampleSpace s2;
     s2.mu1 = {{mux1},
               {muy1}};
-    s2.cov1 = {{sigmax1, 0},
-               {0, sigmay1}};
+    s2.cov1 = {{sigmax1, offDiagonal1},
+               {offDiagonal1, sigmay1}};
     s2.sampCount1 = 40000;
 
     s2.mu2 = {{mux2},
               {muy2}};
-    s2.cov2 = {{sigmax2, 0},
-               {0, sigmay2}};
+    s2.cov2 = {{sigmax2, offDiagonal2},
+               {offDiagonal2, sigmay2}};
     s2.sampCount2 = 160000;
 
     return s2;
 }
 
 int main() {
-    int input;
+    int input, possibility;
 
     vector< pair<string, string> > dataSet1;
     vector< pair<string, string> > dataSet2;
+
+    cout << "Enter the possibility no. (1 or 2): ";
+    cin >> possibility;
 
     cout << "Enter the Experiment no. (1 or 2): ";
     cin >> input;
@@ -113,15 +118,20 @@ int main() {
     sample_mu_x1 /= counter;
     sample_mu_y1 /= counter;
 
-    double sample_sigma_x1 = 0, sample_sigma_y1 = 0;
+    double sample_sigma_x1 = 0, sample_sigma_y1 = 0, sample_cov1 = 0;
     counter = 0;
     for (counter; counter < dataSet1f.size(); counter++) {
         sample_sigma_x1 += pow(dataSet1f[counter].first - sample_mu_x1, 2);
         sample_sigma_y1 += pow(dataSet1f[counter].second - sample_mu_y1, 2);
+        if (possibility == 1) {
+            sample_cov1 += ((dataSet1f[counter].first - sample_mu_x1) * (dataSet1f[counter].second - sample_mu_y1));
+        } else if (possibility == 2) {
+            sample_cov1 = 0;
+        }
     }
     sample_sigma_x1 /= counter;
     sample_sigma_y1 /= counter;
-
+    sample_cov1 /= counter;
 
 
     double sample_mu_x2 = 0, sample_mu_y2 = 0;
@@ -133,22 +143,36 @@ int main() {
     sample_mu_x2 /= counter;
     sample_mu_y2 /= counter;
 
-    double sample_sigma_x2 = 0, sample_sigma_y2 = 0;
+    double sample_sigma_x2 = 0, sample_sigma_y2 = 0, sample_cov2 = 0;
     counter = 0;
     for (counter; counter < dataSet2f.size(); counter++) {
         sample_sigma_x2 += pow(dataSet2f[counter].first - sample_mu_x2, 2);
         sample_sigma_y2 += pow(dataSet2f[counter].second - sample_mu_y2, 2);
+        if (possibility == 1) {
+            sample_cov2 += ((dataSet2f[counter].first - sample_mu_x2) * (dataSet2f[counter].second - sample_mu_y2));
+        } else if (possibility == 2) {
+            sample_cov2 = 0;
+        }
     }
     sample_sigma_x2 /= counter;
     sample_sigma_y2 /= counter;
+    sample_cov2 /= counter;
+
+    cout << endl;
 
     cout << "Distribution 1" << endl;
     cout << "Sample mean: <" << sample_mu_x1 << ", " << sample_mu_y1 << ">" << endl;
-    cout << "Sample covariance: <" << sample_sigma_x1 << ", " << sample_sigma_y1 << ">" << endl;
+    cout << "Sample covariance: " << endl;
+    cout << "[" << sample_sigma_x1 << ", " << sample_cov1 << "]" << endl;
+    cout << "[" << sample_cov1 << ", " << sample_sigma_y1 << "]" << endl;
+
     cout << endl;
+
     cout << "Distribution 2" << endl;
     cout << "Sample mean: <" << sample_mu_x2 << ", " << sample_mu_y2 << ">" << endl;
-    cout << "Sample covariance: <" << sample_sigma_x2 << ", " << sample_sigma_y2 << ">" << endl;
+    cout << "Sample covariance: " << endl;
+    cout << "[" << sample_sigma_x2 << ", " << sample_cov2 << "]" << endl;
+    cout << "[" << sample_cov2 << ", " << sample_sigma_y2 << "]" << endl;
 
     sampleSpace sampleSet;
     int classifierType;
@@ -156,12 +180,14 @@ int main() {
     switch(input) {
         case 1:
             sampleSet = samplespace1(sample_mu_x1, sample_mu_y1, sample_sigma_x1, sample_sigma_y1, 
-                                        sample_mu_x2, sample_mu_y2, sample_sigma_x2, sample_sigma_y2);
+                                        sample_mu_x2, sample_mu_y2, sample_sigma_x2, sample_sigma_y2,
+                                        sample_cov1, sample_cov2);
             classifierType = classifierCase3;
             break;
         case 2:
             sampleSet = samplespace2(sample_mu_x1, sample_mu_y1, sample_sigma_x1, sample_sigma_y1, 
-                                        sample_mu_x2, sample_mu_y2, sample_sigma_x2, sample_sigma_y2);
+                                        sample_mu_x2, sample_mu_y2, sample_sigma_x2, sample_sigma_y2,
+                                        sample_cov1, sample_cov2);
             classifierType = classifierCase3;
             break;
     }
@@ -272,10 +298,10 @@ void classification(vector<Matrix> samp1, vector<Matrix> samp2,
     // Report generation: classification class size ,initial sample size ,
     // miss classification rate and eroor bound
     cout << "\nSamples classified in  class 1: " << w1.size() << ", class 2: " << w2.size() << "\n";
-    cout << "Miss-classified from sample 1: " << miss1.size() << ", sample 2: " << miss2.size() << "\n";
-    cout << "Miss-classification rate  for class 1 : " << (double) miss1.size() / samp1.size() << ", class 2: "
+    cout << "Misclassified from sample 1: " << miss1.size() << ", sample 2: " << miss2.size() << "\n";
+    cout << "Misclassification rate for class 1 : " << (double) miss1.size() / samp1.size() << ", class 2: "
          << (double) miss2.size() / samp2.size() << "\n";
-    cout << "Total miss-classification rate : " << miss_class_rate << '\n';
+    cout << "Total misclassification rate : " << miss_class_rate << '\n';
     cout << "Bhattacharyya error bound: " << errorbound << endl;
 
     //writeAllResultsToFile(sam1,sam1,w1,w2,miss1,miss2);
