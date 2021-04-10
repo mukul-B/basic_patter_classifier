@@ -40,18 +40,19 @@ struct sampleSpace {
 };
 //  sample space 1 have two distribution with same covariance matrix
 sampleSpace samplespace1(float mux1, float muy1, float sigmax1, float sigmay1,
-                            float mux2, float muy2, float sigmax2, float sigmay2) {
+                            float mux2, float muy2, float sigmax2, float sigmay2,
+                            double offDiagonal1, double offDiagonal2) {
     sampleSpace s1;
     s1.mu1 = {{mux1},
               {muy1}};
-    s1.cov1 = {{sigmax1, 0},
-               {0, sigmay1}};
+    s1.cov1 = {{sigmax1, offDiagonal1},
+               {offDiagonal1, sigmay1}};
     s1.sampCount1 = 60000;
 
     s1.mu2 = {{mux2},
               {muy2}};
-    s1.cov2 = {{sigmax2, 0},
-               {0, sigmay2}};
+    s1.cov2 = {{sigmax2, offDiagonal2},
+               {offDiagonal2, sigmay2}};
 
     s1.sampCount2 = 140000;
 
@@ -60,28 +61,32 @@ sampleSpace samplespace1(float mux1, float muy1, float sigmax1, float sigmay1,
 
 //  sample space 1 have two distribution with different covariance matrix
 sampleSpace samplespace2(float mux1, float muy1, float sigmax1, float sigmay1,
-                            float mux2, float muy2, float sigmax2, float sigmay2) {
+                            float mux2, float muy2, float sigmax2, float sigmay2,
+                            double offDiagonal1, double offDiagonal2) {
     sampleSpace s2;
     s2.mu1 = {{mux1},
               {muy1}};
-    s2.cov1 = {{sigmax1, 0},
-               {0, sigmay1}};
+    s2.cov1 = {{sigmax1, offDiagonal1},
+               {offDiagonal1, sigmay1}};
     s2.sampCount1 = 40000;
 
     s2.mu2 = {{mux2},
               {muy2}};
-    s2.cov2 = {{sigmax2, 0},
-               {0, sigmay2}};
+    s2.cov2 = {{sigmax2, offDiagonal2},
+               {offDiagonal2, sigmay2}};
     s2.sampCount2 = 160000;
 
     return s2;
 }
 
 int main() {
-    int input, inputp;
+    int input, inputp, possibility;
 
     vector< pair<string, string> > dataSet1;
     vector< pair<string, string> > dataSet2;
+
+    cout << "Enter the possibility no. (1 or 2): ";
+    cin >> possibility;
 
     cout << "Enter the Experiment no. (1 or 2): ";
     cin >> input;
@@ -107,7 +112,7 @@ int main() {
     dataSet1f = convertStringToFloat(dataSet1);
     dataSet2f = convertStringToFloat(dataSet2);
 
-    cout << "====MENU===="
+    cout << "====MENU====" << endl;
     cout << "1. 0.01%" << endl;
     cout << "2. 0.1%" << endl;
     cout << "3. 1%" << endl;
@@ -171,15 +176,20 @@ int main() {
     sample_mu_x1 /= counter;
     sample_mu_y1 /= counter;
 
-    double sample_sigma_x1 = 0, sample_sigma_y1 = 0;
+    double sample_sigma_x1 = 0, sample_sigma_y1 = 0, sample_cov1 = 0;
     counter = 0;
     for (counter; counter < sampSet1.size(); counter++) {
         sample_sigma_x1 += pow(sampSet1[counter].first - sample_mu_x1, 2);
         sample_sigma_y1 += pow(sampSet1[counter].second - sample_mu_y1, 2);
+        if (possibility == 1) {
+            sample_cov1 += ((dataSet1f[counter].first - sample_mu_x1) * (dataSet1f[counter].second - sample_mu_y1));
+        } else if (possibility == 2) {
+            sample_cov1 = 0;
+        }
     }
     sample_sigma_x1 /= counter;
     sample_sigma_y1 /= counter;
-
+    sample_cov1 /= counter;
 
 
     double sample_mu_x2 = 0, sample_mu_y2 = 0;
@@ -191,22 +201,36 @@ int main() {
     sample_mu_x2 /= counter;
     sample_mu_y2 /= counter;
 
-    double sample_sigma_x2 = 0, sample_sigma_y2 = 0;
+    double sample_sigma_x2 = 0, sample_sigma_y2 = 0, sample_cov2 = 0;
     counter = 0;
     for (counter; counter < sampSet2.size(); counter++) {
         sample_sigma_x2 += pow(sampSet2[counter].first - sample_mu_x2, 2);
         sample_sigma_y2 += pow(sampSet2[counter].second - sample_mu_y2, 2);
+        if (possibility == 1) {
+            sample_cov2 += ((dataSet2f[counter].first - sample_mu_x2) * (dataSet2f[counter].second - sample_mu_y2));
+        } else if (possibility == 2) {
+            sample_cov2 = 0;
+        }
     }
     sample_sigma_x2 /= counter;
     sample_sigma_y2 /= counter;
+    sample_cov2 /= counter;
+
+    cout << endl;
 
     cout << "Distribution 1" << endl;
     cout << "Sample mean: <" << sample_mu_x1 << ", " << sample_mu_y1 << ">" << endl;
-    cout << "Sample covariance: <" << sample_sigma_x1 << ", " << sample_sigma_y1 << ">" << endl;
+    cout << "Sample covariance: " << endl;
+    cout << "[" << sample_sigma_x1 << ", " << sample_cov1 << "]" << endl;
+    cout << "[" << sample_cov1 << ", " << sample_sigma_y1 << "]" << endl;
+
     cout << endl;
+
     cout << "Distribution 2" << endl;
     cout << "Sample mean: <" << sample_mu_x2 << ", " << sample_mu_y2 << ">" << endl;
-    cout << "Sample covariance: <" << sample_sigma_x2 << ", " << sample_sigma_y2 << ">" << endl;
+    cout << "Sample covariance: " << endl;
+    cout << "[" << sample_sigma_x2 << ", " << sample_cov2 << "]" << endl;
+    cout << "[" << sample_cov2 << ", " << sample_sigma_y2 << "]" << endl;
 
     sampleSpace sampleSet;
     int classifierType;
@@ -214,12 +238,14 @@ int main() {
     switch(input) {
         case 1:
             sampleSet = samplespace1(sample_mu_x1, sample_mu_y1, sample_sigma_x1, sample_sigma_y1, 
-                                        sample_mu_x2, sample_mu_y2, sample_sigma_x2, sample_sigma_y2);
+                                        sample_mu_x2, sample_mu_y2, sample_sigma_x2, sample_sigma_y2,
+                                        sample_cov1, sample_cov2);
             classifierType = classifierCase3;
             break;
         case 2:
             sampleSet = samplespace2(sample_mu_x1, sample_mu_y1, sample_sigma_x1, sample_sigma_y1, 
-                                        sample_mu_x2, sample_mu_y2, sample_sigma_x2, sample_sigma_y2);
+                                        sample_mu_x2, sample_mu_y2, sample_sigma_x2, sample_sigma_y2,
+                                        sample_cov1, sample_cov2);
             classifierType = classifierCase3;
             break;
     }
