@@ -15,8 +15,8 @@
 
 using namespace std;
 
-vector< pair<string, string> > returnDataToString(string filename);
-vector< pair<double, double> > convertStringToFloat(vector< pair<string, string> > dataSet);
+vector< pair<string, string> > returnDataToString(string filename);     //Import the data and store the data into a vector pair of strings
+vector< pair<double, double> > convertStringToFloat(vector< pair<string, string> > dataSet);    //Convert the vector pair of strings to vector pair of doubles
 
 void problem(vector<vector<double> > mu1, vector<vector<double> > cov1, int sampCount1,
              vector<vector<double> > mu2, vector<vector<double> > cov2, int sampCount2,
@@ -85,15 +85,18 @@ int main() {
     vector< pair<string, string> > dataSet1;
     vector< pair<string, string> > dataSet2;
 
+    //Prompt the user for possibility
     cout << "Enter the possibility no. (1 or 2): ";
     cin >> possibility;
 
+    //Prompt the user for experiment number
     cout << "Enter the Experiment no. (1 or 2): ";
     cin >> input;
 
     string filename1;
     string filename2;
 
+    //Select the data based on experiment number
     if (input == 1) {
         filename1 = "./psam1.csv";
         filename2 = "./psam2.csv";
@@ -103,15 +106,18 @@ int main() {
         filename2 = "./sam2.csv";
     }
 
+    //Store the data into string vector pairs
     dataSet1 = returnDataToString(filename1);
     dataSet2 = returnDataToString(filename2);
 
     vector< pair<double, double> > dataSet1f;
     vector< pair<double, double> > dataSet2f;
 
+    //Convert the string vector pairs to double vector pairs
     dataSet1f = convertStringToFloat(dataSet1);
     dataSet2f = convertStringToFloat(dataSet2);
 
+    //Prompt the user for sample percentage
     cout << "====MENU====" << endl;
     cout << "1. 0.01%" << endl;
     cout << "2. 0.1%" << endl;
@@ -136,12 +142,15 @@ int main() {
             break;  
     }
 
+    //Calculate the new sample size
     int sampleSize1 = dataSet1f.size() / pctSample;
     int sampleSize2 = dataSet2f.size() / pctSample;
 
     vector< pair<double, double> > sampSet1;
     vector< pair<double, double> > sampSet2;
 
+    //Create a result array which store unique indexes of elements, so we can check if a random index has already
+    //been added to the new sample size vector. This way you can obtain random unique samples.
     srand (time(NULL));
     int results1[sampleSize1];
     int *begin1 = results1;
@@ -155,6 +164,7 @@ int main() {
         sampSet1.push_back(make_pair(dataSet1f[r].first, dataSet1f[r].second));
     }
 
+    //Doing the same for distribution 2
     int results2[sampleSize2];
     int *begin2 = results2;
     int *end2 = begin2 + sampleSize2;
@@ -167,6 +177,7 @@ int main() {
         sampSet2.push_back(make_pair(dataSet2f[r].first, dataSet2f[r].second));
     }
 
+    //Calculate sample mean for Distribution 1
     double sample_mu_x1 = 0, sample_mu_y1 = 0;
     int counter = 0;
     for (counter; counter < sampSet1.size(); counter++) {
@@ -176,6 +187,7 @@ int main() {
     sample_mu_x1 /= counter;
     sample_mu_y1 /= counter;
 
+    //Calculate sample covariance for Distribution 1
     double sample_sigma_x1 = 0, sample_sigma_y1 = 0, sample_cov1 = 0;
     counter = 0;
     for (counter; counter < sampSet1.size(); counter++) {
@@ -191,7 +203,7 @@ int main() {
     sample_sigma_y1 /= counter;
     sample_cov1 /= counter;
 
-
+    //Calculate sample mean for Distribution 2
     double sample_mu_x2 = 0, sample_mu_y2 = 0;
     counter = 0;
     for (counter; counter < sampSet2.size(); counter++) {
@@ -201,6 +213,7 @@ int main() {
     sample_mu_x2 /= counter;
     sample_mu_y2 /= counter;
 
+    //Calculate sample covariance for Distribution 2
     double sample_sigma_x2 = 0, sample_sigma_y2 = 0, sample_cov2 = 0;
     counter = 0;
     for (counter; counter < sampSet2.size(); counter++) {
@@ -218,6 +231,7 @@ int main() {
 
     cout << endl;
 
+    //Display the estimated parameters for both distributions
     cout << "Distribution 1" << endl;
     cout << "Sample mean: <" << sample_mu_x1 << ", " << sample_mu_y1 << ">" << endl;
     cout << "Sample covariance: " << endl;
@@ -232,9 +246,11 @@ int main() {
     cout << "[" << sample_sigma_x2 << ", " << sample_cov2 << "]" << endl;
     cout << "[" << sample_cov2 << ", " << sample_sigma_y2 << "]" << endl;
 
+    //Create a sampleSpace object
     sampleSpace sampleSet;
     int classifierType;
 
+    //Define the object based on the experiment number. In both cases, it would be Case 3 classification
     switch(input) {
         case 1:
             sampleSet = samplespace1(sample_mu_x1, sample_mu_y1, sample_sigma_x1, sample_sigma_y1, 
@@ -250,6 +266,7 @@ int main() {
             break;
     }
 
+    //Execute the problem function based on the new parameters
     problem(sampleSet.mu1, sampleSet.cov1, sampleSet.sampCount1,
             sampleSet.mu2, sampleSet.cov2, sampleSet.sampCount2,
             classifierType, dataSet1f, dataSet2f);
@@ -261,6 +278,7 @@ vector< pair<string, string> > returnDataToString(string filename) {
     vector< pair<string, string> > dataSet;
     string x_val, y_val;
 
+    //Read till the end of file and store data into vector pair of strings
     ifstream dataFile(filename);
     if(dataFile.is_open()) {
         while (!dataFile.eof()) {
@@ -275,6 +293,7 @@ vector< pair<string, string> > returnDataToString(string filename) {
 vector< pair<double, double> > convertStringToFloat(vector< pair<string, string> > dataSet) {
     vector< pair<double, double> > dataSetf;
     for (int i = 0; i < dataSet.size() - 1; i++) {
+        //Convert the vector pair of strings to vector pair of doubles using stod()
         dataSetf.push_back(make_pair(stod(dataSet[i].first), stod(dataSet[i].second)));
     }
     return dataSetf;
@@ -301,8 +320,8 @@ void problem(vector<vector<double> > mu1, vector<vector<double> > cov1, int samp
     double prior1 = (double) sampCount1 / sampCountT;
     double prior2 = (double) sampCount2 / sampCountT;
 
- // creating random Samples in form of Matrix  by  using box muller method
- // sampleMatrix return vector of Matrix using box-mular and given  mu and sigma values
+ // creating random Samples in form of Matrix  by the estimated parameters
+ // sampleMatrix return vector of Matrix using estimated parameters and given  mu and sigma values
     vector<Matrix> sam1 = sampleMatrix(mu1, cov1, mudimen, sampCount1, inputData1);
     vector<Matrix> sam2 = sampleMatrix(mu2, cov2, mudimen, sampCount2, inputData2);
 
